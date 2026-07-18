@@ -1,0 +1,11 @@
+package com.odschool.repository;
+
+import com.odschool.entity.SubjectMarkEntity;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+
+@Repository
+public interface SubjectMarkRepository extends JpaRepository<SubjectMarkEntity, Integer> {
+}

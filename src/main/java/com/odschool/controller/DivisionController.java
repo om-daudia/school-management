@@ -1,0 +1,40 @@
+package com.odschool.controller;
+
+import com.odschool.dtos.DivisionRequest;
+import com.odschool.dtos.DivisionResponse;
+import com.odschool.service.DivisionService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/standard/{standardId}/division")
+public class DivisionController {
+    @Autowired
+    DivisionService divisionService;
+
+    @GetMapping()
+    public ResponseEntity<Object> getAllDivisions() {
+        return divisionService.getAllDivisions();
+    }
+
+    @PostMapping()
+    public ResponseEntity<Object> addDivision(@RequestBody DivisionRequest divisionRequest) {
+        return divisionService.addDivision(divisionRequest);
+    }
+
+    @GetMapping("/{divisionId}")
+    public ResponseEntity<Object> getDivisionById(@PathVariable int divisionId) {
+        return divisionService.getDivisionById(divisionId);
+    }
+
+    @DeleteMapping("/{divisionId}")
+    public ResponseEntity<Object> deleteDivision(@PathVariable int divisionId) {
+        return divisionService.deleteDivision(divisionId);
+    }
+
+    @PatchMapping("/{divisionId}")
+    public ResponseEntity<Object> modifyDivision(@RequestBody DivisionResponse divisionResponseDto, @PathVariable int divisionId) {
+        return divisionService.modifyDivision(divisionResponseDto, divisionId);
+    }
+}
