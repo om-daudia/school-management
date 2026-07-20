@@ -38,16 +38,16 @@ public class StandardService {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    public ResponseEntity<Object> addStandard(StandardRequest standardRequest) {
+    public ResponseEntity<Object> addStandard(StandardRequest standardRequest, int schoolId) {
         log.trace("[SERVICE] Start adding new Standard: {}", standardRequest.getStandard());
         try {
             StandardEntity findStandard = standardRepository.findByStandardAndSchoolEntity_Id(
-                    standardRequest.getStandard(), standardRequest.getSchoolId());
+                    standardRequest.getStandard(), schoolId);
 
             if (findStandard == null) {
-                SchoolEntity schoolEntity = schoolRepository.findById(standardRequest.getSchoolId()).orElse(null);
+                SchoolEntity schoolEntity = schoolRepository.findById(schoolId).orElse(null);
                 if (schoolEntity == null) {
-                    log.warn("[SERVICE] school not found with schoolId: {}", standardRequest.getSchoolId());
+                    log.warn("[SERVICE] school not found with schoolId: {}", schoolId);
                     ApiResponse response = new ApiResponse(
                             "SCHOOL_NOT_FOUND_ERROR", "School not found", false, HttpStatus.NOT_FOUND.value()
                     );
@@ -56,11 +56,11 @@ public class StandardService {
 
                 StandardEntity standardEntity = mapInterface.toStandardEntity(standardRequest);
                 standardEntity.setSchoolEntity(schoolEntity);
-                standardRepository.save(standardEntity);
+                StandardEntity resp = standardRepository.save(standardEntity);
 
                 log.info("[SERVICE] standard add successful");
                 ApiResponse response = new ApiResponse(
-                        mapInterface.toStandardResponse(standardEntity),
+                        mapInterface.toStandardResponse(resp),
                         "new standard added", true, HttpStatus.OK.value()
                 );
                 return new ResponseEntity<>(response, HttpStatus.OK);
@@ -130,8 +130,8 @@ public class StandardService {
         }
     }
 
-    public ResponseEntity<Object> modifyStandard(StandardResponse standardDto, int standardId) {
-        log.trace("[SERVICE] Start modifyStandard with standardDTO: {} and standardId: {}", standardDto, standardId);
+    public ResponseEntity<Object> modifyStandard(StandardRequest standardRequest, int standardId) {
+        log.trace("[SERVICE] Start modifyStandard with standardDTO: {} and standardId: {}", standardRequest, standardId);
         try {
             StandardEntity standardEntity = standardRepository.findById(standardId).orElse(null);
             if (standardEntity == null) {
@@ -142,7 +142,7 @@ public class StandardService {
                 return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
             }
 
-            standardEntity.setStandard(standardDto.getStandard());
+            standardEntity.setStandard(standardRequest.getStandard());
             standardRepository.save(standardEntity);
             log.info("[SERVICE] update successful with standardId: {}", standardEntity.getId());
 

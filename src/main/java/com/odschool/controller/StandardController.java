@@ -1,7 +1,6 @@
 package com.odschool.controller;
 
 import com.odschool.dtos.StandardRequest;
-import com.odschool.dtos.StandardResponse;
 import com.odschool.service.StandardService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -19,8 +18,8 @@ public class StandardController {
     }
 
     @PostMapping()
-    public ResponseEntity<Object> addStandard(@RequestBody StandardRequest standardRequest) {
-        return standardService.addStandard(standardRequest);
+    public ResponseEntity<Object> addStandard(@RequestBody StandardRequest standardRequest, @PathVariable int schoolId) {
+        return standardService.addStandard(standardRequest, schoolId);
     }
 
     @GetMapping("/{standardId}")
@@ -34,7 +33,7 @@ public class StandardController {
     }
 
     @PatchMapping("/{standardId}")
-    public ResponseEntity<Object> modifyStandard(@RequestBody StandardResponse standardResponseDto, @PathVariable int standardId) {
-        return standardService.modifyStandard(standardResponseDto, standardId);
+    public ResponseEntity<Object> modifyStandard(@RequestBody StandardRequest standardRequest, @PathVariable int standardId) {
+        return standardService.modifyStandard(standardRequest, standardId);
     }
 }

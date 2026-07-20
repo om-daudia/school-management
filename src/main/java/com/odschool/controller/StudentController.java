@@ -19,8 +19,8 @@ public class StudentController {
     }
 
     @PostMapping()
-    public ResponseEntity<Object> addStudent(@RequestBody StudentRequest studentRequest) {
-        return studentService.addStudent(studentRequest);
+    public ResponseEntity<Object> addStudent(@RequestBody StudentRequest studentRequest, @PathVariable int divisionId) {
+        return studentService.addStudent(studentRequest, divisionId);
     }
 
     @GetMapping("/{studentId}")

@@ -37,14 +37,14 @@ public class StudentService {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    public ResponseEntity<Object> addStudent(StudentRequest studentRequest) {
+    public ResponseEntity<Object> addStudent(StudentRequest studentRequest, int divisionId) {
         log.trace("[SERVICE] Start adding new Student: {}", studentRequest.getStudentName());
         try {
             StudentEntity findStudent = studentRepository.findByStudentNameAndDivisionEntity_Id(
-                    studentRequest.getStudentName(), studentRequest.getDivisionId());
+                    studentRequest.getStudentName(), divisionId);
 
             if (findStudent == null) {
-                DivisionEntity divisionEntity = divisionRepository.findById(studentRequest.getDivisionId()).orElse(null);
+                DivisionEntity divisionEntity = divisionRepository.findById(divisionId).orElse(null);
                 if (divisionEntity == null) {
                     ApiResponse response = new ApiResponse(
                             "DIVISION_NOT_FOUND_ERROR", "Division not found", false, HttpStatus.NOT_FOUND.value()

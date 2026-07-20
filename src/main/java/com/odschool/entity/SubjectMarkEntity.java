@@ -1,9 +1,11 @@
 package com.odschool.entity;
 
 import jakarta.persistence.*;
+import lombok.Data;
 
 @Entity
 @Table(name = "subject_marks")
+@Data
 public class SubjectMarkEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

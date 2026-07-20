@@ -37,14 +37,14 @@ public class DivisionService {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    public ResponseEntity<Object> addDivision(DivisionRequest divisionRequest) {
+    public ResponseEntity<Object> addDivision(DivisionRequest divisionRequest, int standardId) {
         log.trace("[SERVICE] Start adding new Division: {}", divisionRequest.getDivision());
         try {
             DivisionEntity findDivision = divisionRepository.findByDivisionAndStandardEntity_Id(
-                    divisionRequest.getDivision(), divisionRequest.getStandardId());
+                    divisionRequest.getDivision(), standardId);
 
             if (findDivision == null) {
-                StandardEntity standardEntity = standardRepository.findById(divisionRequest.getStandardId()).orElse(null);
+                StandardEntity standardEntity = standardRepository.findById(standardId).orElse(null);
                 if (standardEntity == null) {
                     ApiResponse response = new ApiResponse(
                             "STANDARD_NOT_FOUND_ERROR", "Standard not found", false, HttpStatus.NOT_FOUND.value()

@@ -8,5 +8,4 @@ public class StudentRequest {
     private float obtainMarks;
     private float percentage;
     private String result;
-    private int divisionId;
 }

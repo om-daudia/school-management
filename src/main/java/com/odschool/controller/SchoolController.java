@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.*;
 public class SchoolController {
     @Autowired
     SchoolService schoolService;
-
     @GetMapping()
     public ResponseEntity<Object> getAllSchools(){
         return schoolService.getAllSchools();
