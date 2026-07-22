@@ -10,4 +10,6 @@ import java.util.List;
 public interface StudentRepository extends JpaRepository<StudentEntity, Integer> {
     StudentEntity findByStudentNameAndDivisionEntity_Id(String studentName, int divisionId);
 
+    List<StudentEntity> findByDivisionEntityIdIn(List<Integer> divisionList);
+    List<StudentEntity> findAllByDivisionEntityId(int divisionId);
 }
