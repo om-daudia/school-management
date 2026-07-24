@@ -1,0 +1,31 @@
+databaseChangeLog:
+  - changeSet:
+      id: 5
+      author: odschool
+      changes:
+        - createTable:
+            tableName: subjectmark
+            columns:
+              - column:
+                  name: id
+                  type: INT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: subject_name
+                  type: VARCHAR(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: marks
+                  type: INT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: student_id
+                  type: INT
+                  constraints:
+                    foreignKeyName: fk_subjectmark_student
+                    references: student(id)

@@ -1,0 +1,27 @@
+databaseChangeLog:
+  - changeSet:
+      id: 3
+      author: odschool
+      changes:
+        - createTable:
+            tableName: division
+            columns:
+              - column:
+                  name: id
+                  type: INT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: division
+                  type: CHAR(1)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: standard_id
+                  type: INT
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_division_standard
+                    references: standard(id)

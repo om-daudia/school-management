@@ -1,0 +1,11 @@
+databaseChangeLog:
+  - include:
+      file: db/changelog/changes/001-create-school-table.yaml
+  - include:
+      file: db/changelog/changes/002-create-standard-table.yaml
+  - include:
+      file: db/changelog/changes/003-create-division-table.yaml
+  - include:
+      file: db/changelog/changes/004-create-student-table.yaml
+  - include:
+      file: db/changelog/changes/005-create-subjectmark-table.yaml

@@ -1,0 +1,27 @@
+databaseChangeLog:
+  - changeSet:
+      id: 2
+      author: odschool
+      changes:
+        - createTable:
+            tableName: standard
+            columns:
+              - column:
+                  name: id
+                  type: INT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: standard
+                  type: INT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: school_id
+                  type: INT
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_standard_school
+                    references: school(id)

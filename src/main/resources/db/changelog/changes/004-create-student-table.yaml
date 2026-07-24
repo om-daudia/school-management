@@ -1,0 +1,36 @@
+databaseChangeLog:
+  - changeSet:
+      id: 4
+      author: odschool
+      changes:
+        - createTable:
+            tableName: student
+            columns:
+              - column:
+                  name: id
+                  type: INT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: student_name
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: obtain_marks
+                  type: FLOAT
+              - column:
+                  name: percentage
+                  type: FLOAT
+              - column:
+                  name: result
+                  type: VARCHAR(50)
+              - column:
+                  name: division_id
+                  type: INT
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_student_division
+                    references: division(id)
