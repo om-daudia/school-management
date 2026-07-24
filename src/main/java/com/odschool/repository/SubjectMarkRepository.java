@@ -9,5 +9,6 @@ import java.util.List;
 @Repository
 public interface SubjectMarkRepository extends JpaRepository<SubjectMarkEntity, Integer> {
     SubjectMarkEntity findBySubjectNameAndStudentEntity_Id(String subjectName, int studentId);
+    List<SubjectMarkEntity> findAllByStudentEntity_Id(int studentId);
 
 }

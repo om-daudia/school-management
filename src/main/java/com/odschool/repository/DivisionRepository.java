@@ -9,5 +9,5 @@ import java.util.List;
 @Repository
 public interface DivisionRepository extends JpaRepository<DivisionEntity, Integer> {
     DivisionEntity findByDivisionAndStandardEntity_Id(char division, int standardId);
-    List<DivisionEntity> findByStandardEntityId(int standardId);
+    List<DivisionEntity> findAllByStandardEntityId(int standardId);
 }

@@ -1,6 +1,7 @@
 package com.odschool.service;
 
 import com.odschool.dtos.ApiResponse;
+import com.odschool.dtos.GetAllStudentRequest;
 import com.odschool.dtos.StudentRequest;
 import com.odschool.dtos.StudentResponse;
 import com.odschool.entity.DivisionEntity;
@@ -33,9 +34,40 @@ public class StudentService {
                 .map(mapInterface::toStudentResponse)
                 .collect(Collectors.toList());
 
-        ApiResponse response = new ApiResponse(studentList, "Student list", true, HttpStatus.OK.value());
+        ApiResponse response = new ApiResponse(studentList, "Student All list", true, HttpStatus.OK.value());
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
+    public ResponseEntity<Object> getAllStudentsOfSchool(GetAllStudentRequest request) {
+        log.info("[SERVICE] Start fetching all students");
+        List<StudentResponse> studentList = studentRepository.findAllByDivisionEntity_StandardEntity_SchoolEntity_Id(request.getSchoolId()).stream()
+                .map(mapInterface::toStudentResponse)
+                .collect(Collectors.toList());
+
+        ApiResponse response = new ApiResponse(studentList, "Student All List of SchoolId: "+request.getSchoolId(), true, HttpStatus.OK.value());
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    public ResponseEntity<Object> getAllStudentsOfDivision(GetAllStudentRequest request) {
+        log.info("[SERVICE] Start fetching all students");
+        List<StudentResponse> studentList = studentRepository.findAllByDivisionEntityId(request.getDivisionId()).stream()
+                .map(mapInterface::toStudentResponse)
+                .collect(Collectors.toList());
+
+        ApiResponse response = new ApiResponse(studentList, "Student All List of DivisionId: "+request.getDivisionId(), true, HttpStatus.OK.value());
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    public ResponseEntity<Object> getAllStudentsOfStandard(GetAllStudentRequest request) {
+        log.info("[SERVICE] Start fetching all students");
+        List<StudentResponse> studentList = studentRepository.findAllByDivisionEntity_StandardEntity_Id(request.getStandardId()).stream()
+                .map(mapInterface::toStudentResponse)
+                .collect(Collectors.toList());
+
+        ApiResponse response = new ApiResponse(studentList, "Student All list of StandardId: "+request.getStandardId(), true, HttpStatus.OK.value());
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
 
     public ResponseEntity<Object> addStudent(StudentRequest studentRequest, int divisionId) {
         log.trace("[SERVICE] Start adding new Student: {}", studentRequest.getStudentName());

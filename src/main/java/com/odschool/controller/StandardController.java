@@ -7,14 +7,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/odschool/school/{schoolId}/standard")
+@RequestMapping("odschool/school/{schoolId}/standardId")
 public class StandardController {
     @Autowired
     StandardService standardService;
 
     @GetMapping()
-    public ResponseEntity<Object> getAllStandards() {
-        return standardService.getAllStandards();
+    public ResponseEntity<Object> getAllStandards(@PathVariable int schoolId) {
+        return standardService.getAllStandards(schoolId);
     }
 
     @PostMapping()

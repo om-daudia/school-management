@@ -2,7 +2,6 @@ package com.odschool.service;
 
 import com.odschool.dtos.ApiResponse;
 import com.odschool.dtos.SearchRequest;
-import com.odschool.dtos.StandardRequest;
 import com.odschool.dtos.StudentResponse;
 import com.odschool.entity.DivisionEntity;
 import com.odschool.entity.StandardEntity;
@@ -40,7 +39,7 @@ public class ReportService {
             return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
         }
 
-        List<DivisionEntity> divisionEntityList = divisionRepository.findByStandardEntityId(standardEntity.getId());
+        List<DivisionEntity> divisionEntityList = divisionRepository.findAllByStandardEntityId(standardEntity.getId());
 
         List<StudentEntity> studentEntityList = studentRepository.findByDivisionEntityIdIn(divisionEntityList.stream().map(DivisionEntity::getId).toList());
 
@@ -85,7 +84,7 @@ public class ReportService {
             );
             return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
         }
-        List<DivisionEntity> divisionEntityList = divisionRepository.findByStandardEntityId(standardEntity.getId());
+        List<DivisionEntity> divisionEntityList = divisionRepository.findAllByStandardEntityId(standardEntity.getId());
         List<StudentEntity> studentEntityList = studentRepository.findByDivisionEntityIdIn(divisionEntityList.stream().map(DivisionEntity::getId).toList());
         long totalStudent =(long) studentEntityList.size();
         long totalPassedStudent = studentEntityList.stream()
@@ -105,7 +104,7 @@ public class ReportService {
             );
             return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
         }
-        List<DivisionEntity> divisionEntityList = divisionRepository.findByStandardEntityId(standardEntity.getId());
+        List<DivisionEntity> divisionEntityList = divisionRepository.findAllByStandardEntityId(standardEntity.getId());
         List<StudentEntity> studentEntityList = studentRepository.findByDivisionEntityIdIn(divisionEntityList.stream().map(DivisionEntity::getId).toList());
         long totalStudent =(long) studentEntityList.size();
         long totalFailedStudent = studentEntityList.stream()
