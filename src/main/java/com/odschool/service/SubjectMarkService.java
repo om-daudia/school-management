@@ -27,9 +27,9 @@ public class SubjectMarkService {
     @Autowired
     MapInterface mapInterface;
 
-    public ResponseEntity<Object> getAllSubjectMarks() {
+    public ResponseEntity<Object> getAllSubjectMarks(int studentId) {
         log.info("[SERVICE] Start fetching all subject marks");
-        List<SubjectMarkResponse> subjectMarkList = subjectMarkRepository.findAll().stream()
+        List<SubjectMarkResponse> subjectMarkList = subjectMarkRepository.findAllByStudentEntity_Id(studentId).stream()
                 .map(mapInterface::toSubjectMarkResponse)
                 .collect(Collectors.toList());
 

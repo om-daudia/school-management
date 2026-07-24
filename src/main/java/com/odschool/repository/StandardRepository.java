@@ -8,5 +8,6 @@ import java.util.List;
 
 @Repository
 public interface StandardRepository extends JpaRepository<StandardEntity, Integer> {
+    List<StandardEntity> findAllBySchoolEntity_Id(int schoolId);
     StandardEntity findByStandardAndSchoolEntity_Id(int standard, int schoolId);
 }

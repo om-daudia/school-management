@@ -1,0 +1,28 @@
+#  spring:
+#    application:
+#      name: odschool
+#    datasource:
+#      url: jdbc:postgresql://localhost:5432/schoolDB
+#      username: postgres
+#      password: root
+#      driver-class-name: org.postgresql.Driver
+#    jpa:
+#      hibernate:
+#        ddl-auto: update
+#      show-sql: true
+#      properties:
+#        hibernate:
+#          dialect: org.hibernate.dialect.PostgreSQLDialect
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/schoolDB
+    username: postgres
+    password: root
+    driver-class-name: org.postgresql.Driver
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+  jpa:
+    hibernate:
+      ddl-auto: validate
