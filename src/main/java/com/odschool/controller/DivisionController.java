@@ -8,14 +8,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("odschool/standard/{standardId}/division")
+@RequestMapping("odschool/standardId/{standardId}/divisionId")
 public class DivisionController {
     @Autowired
     DivisionService divisionService;
 
     @GetMapping()
-    public ResponseEntity<Object> getAllDivisions() {
-        return divisionService.getAllDivisions();
+    public ResponseEntity<Object> getAllDivisions(@PathVariable int standardId) {
+        return divisionService.getAllDivisions(standardId);
     }
 
     @PostMapping()

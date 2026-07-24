@@ -27,9 +27,9 @@ public class DivisionService {
     @Autowired
     MapInterface mapInterface;
 
-    public ResponseEntity<Object> getAllDivisions() {
+    public ResponseEntity<Object> getAllDivisions(int standardId) {
         log.info("[SERVICE] Start fetching all divisions");
-        List<DivisionResponse> divisionList = divisionRepository.findAll().stream()
+        List<DivisionResponse> divisionList = divisionRepository.findAllByStandardEntityId(standardId).stream()
                 .map(mapInterface::toDivisionResponse)
                 .collect(Collectors.toList());
 
@@ -58,7 +58,7 @@ public class DivisionService {
 
                 ApiResponse response = new ApiResponse(
                         mapInterface.toDivisionResponse(divisionEntity),
-                        "new division added", true, HttpStatus.OK.value()
+                        "new divisionId added", true, HttpStatus.OK.value()
                 );
                 return new ResponseEntity<>(response, HttpStatus.OK);
             } else {
@@ -68,7 +68,7 @@ public class DivisionService {
                 return new ResponseEntity<>(response, HttpStatus.CONFLICT);
             }
         } catch (Exception e) {
-            log.error("[SERVICE] Unexpected error while adding division", e);
+            log.error("[SERVICE] Unexpected error while adding divisionId", e);
             ApiResponse response = new ApiResponse(
                     "DIVISION_UNEXPECTED_ERROR", "Division unexpected error", false, HttpStatus.NOT_FOUND.value()
             );
@@ -87,11 +87,11 @@ public class DivisionService {
             }
 
             ApiResponse response = new ApiResponse(
-                    mapInterface.toDivisionResponse(findDivision), "division found successful", true, HttpStatus.OK.value()
+                    mapInterface.toDivisionResponse(findDivision), "divisionId found successful", true, HttpStatus.OK.value()
             );
             return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (Exception e) {
-            log.error("[SERVICE] Unexpected error while fetching division with divisionId: {}", divisionId, e);
+            log.error("[SERVICE] Unexpected error while fetching divisionId with divisionId: {}", divisionId, e);
             ApiResponse response = new ApiResponse(
                     "DIVISION_UNEXPECTED_ERROR", "Division unexpected error", false, HttpStatus.NOT_FOUND.value()
             );
@@ -113,7 +113,7 @@ public class DivisionService {
             ApiResponse response = new ApiResponse("Division Deleted", "successful", true, HttpStatus.OK.value());
             return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (Exception e) {
-            log.error("[SERVICE] Unexpected error while deleting division with divisionId: {}", divisionId, e);
+            log.error("[SERVICE] Unexpected error while deleting divisionId with divisionId: {}", divisionId, e);
             ApiResponse response = new ApiResponse(
                     "DIVISION_UNEXPECTED_ERROR", "Division unexpected error", false, HttpStatus.NOT_FOUND.value()
             );
@@ -139,7 +139,7 @@ public class DivisionService {
             );
             return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (Exception e) {
-            log.error("[SERVICE] Unexpected error while modifying division with divisionId: {}", divisionId, e);
+            log.error("[SERVICE] Unexpected error while modifying divisionId with divisionId: {}", divisionId, e);
             ApiResponse response = new ApiResponse(
                     "DIVISION_UNEXPECTED_ERROR", "Division unexpected error", false, HttpStatus.NOT_FOUND.value()
             );

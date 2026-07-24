@@ -27,9 +27,9 @@ public class StandardService {
     @Autowired
     MapInterface mapInterface;
 
-    public ResponseEntity<Object> getAllStandards() {
+    public ResponseEntity<Object> getAllStandards(int schoolId) {
         log.info("[SERVICE] Start fetching all standards");
-        List<StandardResponse> standardList = standardRepository.findAll().stream()
+        List<StandardResponse> standardList = standardRepository.findAllBySchoolEntity_Id(schoolId).stream()
                 .map(mapInterface::toStandardResponse)
                 .collect(Collectors.toList());
 
@@ -58,21 +58,21 @@ public class StandardService {
                 standardEntity.setSchoolEntity(schoolEntity);
                 StandardEntity resp = standardRepository.save(standardEntity);
 
-                log.info("[SERVICE] standard add successful");
+                log.info("[SERVICE] standardId add successful");
                 ApiResponse response = new ApiResponse(
                         mapInterface.toStandardResponse(resp),
-                        "new standard added", true, HttpStatus.OK.value()
+                        "new standardId added", true, HttpStatus.OK.value()
                 );
                 return new ResponseEntity<>(response, HttpStatus.OK);
             } else {
-                log.info("[SERVICE] standard already exists for this school");
+                log.info("[SERVICE] standardId already exists for this school");
                 ApiResponse response = new ApiResponse(
                         "STANDARD_EXIST_ERROR", "Standard already exist", false, HttpStatus.CONFLICT.value()
                 );
                 return new ResponseEntity<>(response, HttpStatus.CONFLICT);
             }
         } catch (Exception e) {
-            log.error("[SERVICE] Unexpected error while adding standard", e);
+            log.error("[SERVICE] Unexpected error while adding standardId", e);
             ApiResponse response = new ApiResponse(
                     "STANDARD_UNEXPECTED_ERROR", "Standard unexpected error", false, HttpStatus.NOT_FOUND.value()
             );
@@ -81,11 +81,11 @@ public class StandardService {
     }
 
     public ResponseEntity<Object> getStandardById(int standardId) {
-        log.trace("[SERVICE] Start fetching standard with standardId: {}", standardId);
+        log.trace("[SERVICE] Start fetching standardId with standardId: {}", standardId);
         try {
             StandardEntity findStandard = standardRepository.findById(standardId).orElse(null);
             if (findStandard == null) {
-                log.warn("[SERVICE] standard not found with standardId: {}", standardId);
+                log.warn("[SERVICE] standardId not found with standardId: {}", standardId);
                 ApiResponse response = new ApiResponse(
                         "STANDARD_NOT_FOUND_ERROR", "Standard not found", false, HttpStatus.NOT_FOUND.value()
                 );
@@ -93,10 +93,10 @@ public class StandardService {
             }
 
             StandardResponse standardResponse = mapInterface.toStandardResponse(findStandard);
-            ApiResponse response = new ApiResponse(standardResponse, "standard found successful", true, HttpStatus.OK.value());
+            ApiResponse response = new ApiResponse(standardResponse, "standardId found successful", true, HttpStatus.OK.value());
             return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (Exception e) {
-            log.error("[SERVICE] Unexpected error while fetching standard with standardId: {}", standardId, e);
+            log.error("[SERVICE] Unexpected error while fetching standardId with standardId: {}", standardId, e);
             ApiResponse response = new ApiResponse(
                     "STANDARD_UNEXPECTED_ERROR", "Standard unexpected error", false, HttpStatus.NOT_FOUND.value()
             );
@@ -109,7 +109,7 @@ public class StandardService {
         try {
             StandardEntity standardEntity = standardRepository.findById(standardId).orElse(null);
             if (standardEntity == null) {
-                log.warn("[SERVICE] standard not found with standardId: {}", standardId);
+                log.warn("[SERVICE] standardId not found with standardId: {}", standardId);
                 ApiResponse response = new ApiResponse(
                         "STANDARD_NOT_FOUND_ERROR", "Standard not found", false, HttpStatus.NOT_FOUND.value()
                 );
@@ -117,12 +117,12 @@ public class StandardService {
             }
 
             standardRepository.deleteById(standardEntity.getId());
-            log.info("[SERVICE] standard deleted successful with standardId {}", standardEntity.getId());
+            log.info("[SERVICE] standardId deleted successful with standardId {}", standardEntity.getId());
 
             ApiResponse response = new ApiResponse("Standard Deleted", "successful", true, HttpStatus.OK.value());
             return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (Exception e) {
-            log.error("[SERVICE] Unexpected error while deleting standard with standardId: {}", standardId, e);
+            log.error("[SERVICE] Unexpected error while deleting standardId with standardId: {}", standardId, e);
             ApiResponse response = new ApiResponse(
                     "STANDARD_UNEXPECTED_ERROR", "Standard unexpected error", false, HttpStatus.NOT_FOUND.value()
             );
@@ -135,7 +135,7 @@ public class StandardService {
         try {
             StandardEntity standardEntity = standardRepository.findById(standardId).orElse(null);
             if (standardEntity == null) {
-                log.warn("[SERVICE] standard not found with standardId: {}", standardId);
+                log.warn("[SERVICE] standardId not found with standardId: {}", standardId);
                 ApiResponse response = new ApiResponse(
                         "STANDARD_NOT_FOUND_ERROR", "Standard not found", false, HttpStatus.NOT_FOUND.value()
                 );
@@ -151,7 +151,7 @@ public class StandardService {
             );
             return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (Exception e) {
-            log.error("[SERVICE] Unexpected error while modifying standard with standardId: {}", standardId, e);
+            log.error("[SERVICE] Unexpected error while modifying standardId with standardId: {}", standardId, e);
             ApiResponse response = new ApiResponse(
                     "STANDARD_UNEXPECTED_ERROR", "Standard unexpected error", false, HttpStatus.NOT_FOUND.value()
             );

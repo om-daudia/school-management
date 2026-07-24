@@ -8,14 +8,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/student/{studentId}/subjectmark")
+@RequestMapping("odschool/student/{studentId}/subjectmark")
 public class SubjectMarkController {
     @Autowired
     SubjectMarkService subjectMarkService;
 
     @GetMapping()
-    public ResponseEntity<Object> getAllSubjectMarks() {
-        return subjectMarkService.getAllSubjectMarks();
+    public ResponseEntity<Object> getAllSubjectMarks(@PathVariable int studentId) {
+        return subjectMarkService.getAllSubjectMarks(studentId);
     }
 
     @PostMapping()
