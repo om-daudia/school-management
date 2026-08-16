@@ -4,6 +4,7 @@ import com.odschool.dtos.ApiResponse;
 import com.odschool.dtos.SchoolRequest;
 import com.odschool.dtos.SchoolResponse;
 import com.odschool.entity.SchoolEntity;
+import com.odschool.exception.ApiException;
 import com.odschool.interfaces.MapInterface;
 import com.odschool.repository.SchoolRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -24,137 +25,110 @@ public class SchoolService {
     MapInterface mapInterface;
 
     public ResponseEntity<Object> getAllSchools() {
-        log.info("[SERVICE] Start fetching all schools");
+        log.info("[ODSCHOOL][SchoolService] Start fetching all schools");
+
         List<SchoolResponse> schoolList = schoolRepository.findAll().stream()
                 .map(mapInterface::toSchoolResponse)
                 .collect(Collectors.toList());
 
-        log.info("[SERVICE] Fetched {} schools", schoolList.size());
+        log.info("[ODSCHOOL][SchoolService] Fetched {} schools successfully", schoolList.size());
+
         ApiResponse response = new ApiResponse(schoolList, "School list", true, HttpStatus.OK.value());
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
 
     public ResponseEntity<Object> addSchool(SchoolRequest schoolRequest) {
-        log.trace("[SERVICE] Start adding new School with school name: {}", schoolRequest.getSchoolName());
-        try {
-            SchoolEntity findSchool = schoolRepository.findBySchoolName(schoolRequest.getSchoolName());
-            if (findSchool == null) {
-                SchoolEntity schoolEntity = new SchoolEntity(schoolRequest.getSchoolName());
-                schoolRepository.save(schoolEntity);
+        log.info("[ODSCHOOL][SchoolService] Start adding new School with school name: {}", schoolRequest.getSchoolName());
 
-                log.info("[SERVICE] school add successful and sending successful responseEntity");
-                log.trace("[SERVICE] exit from addSchool method");
-
-                ApiResponse response = new ApiResponse(
-                        mapInterface.toSchoolResponse(schoolEntity),
-                        "new school added",
-                        true,
-                        HttpStatus.OK.value()
-                );
-                return new ResponseEntity<>(response, HttpStatus.OK);
-            } else {
-                log.info("[SERVICE] school already exist and sending unsuccessful responseEntity");
-                log.trace("[SERVICE] Finished adding school");
-                ApiResponse response = new ApiResponse(
-                        "SCHOOL_EXIST_ERROR", "School already exist", false, HttpStatus.CONFLICT.value()
-                );
-                return new ResponseEntity<>(response, HttpStatus.CONFLICT);
-            }
-        } catch (Exception e) {
-            log.error("[SERVICE] Unexpected error while adding school", e);
-            ApiResponse response = new ApiResponse(
-                    "SCHOOL_UNEXPECTED_ERROR", "School unexpected error", false, HttpStatus.NOT_FOUND.value()
-            );
-            return new ResponseEntity<>(response, HttpStatus.CONFLICT);
+        SchoolEntity findSchool = schoolRepository.findBySchoolName(schoolRequest.getSchoolName());
+        if (findSchool != null) {
+            log.info("[ODSCHOOL][SchoolService] School already exists with school name: {}, sending CONFLICT response",
+                    schoolRequest.getSchoolName());
+            throw new ApiException("School already exist", HttpStatus.CONFLICT);
         }
+
+        SchoolEntity schoolEntity = new SchoolEntity(schoolRequest.getSchoolName());
+        schoolRepository.save(schoolEntity);
+
+        log.info("[ODSCHOOL][SchoolService] School added successfully with schoolId: {} and school name: {}",
+                schoolEntity.getId(), schoolEntity.getSchoolName());
+
+        ApiResponse response = new ApiResponse(
+                mapInterface.toSchoolResponse(schoolEntity),
+                "new school added",
+                true,
+                HttpStatus.OK.value()
+        );
+        return new ResponseEntity<>(response, HttpStatus.OK);
+
     }
 
     public ResponseEntity<Object> getSchoolById(int schoolId) {
-        log.trace("[SERVICE] Start fetching school with schoolId: {}", schoolId);
-        try {
-            SchoolEntity findSchool = schoolRepository.findById(schoolId).orElse(null);
+        log.info("[ODSCHOOL][SchoolService] Start fetching school with schoolId: {}", schoolId);
 
-            if (findSchool == null) {
-                log.warn("[SERVICE] school not found with schoolId: {}", schoolId);
-                ApiResponse response = new ApiResponse(
-                        "SCHOOL_NOT_FOUND_ERROR", "School not found", false, HttpStatus.NOT_FOUND.value()
-                );
-                return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
-            }
+        SchoolEntity findSchool = schoolRepository.findById(schoolId).orElse(null);
 
-            SchoolResponse schoolResponse = mapInterface.toSchoolResponse(findSchool);
-            log.info("[SERVICE] school found with schoolId {} and returning SchoolResponse", schoolId);
-
-            ApiResponse response = new ApiResponse(schoolResponse, "school found successful", true, HttpStatus.OK.value());
-            return new ResponseEntity<>(response, HttpStatus.OK);
-        } catch (Exception e) {
-            log.error("[SERVICE] Unexpected error while fetching school with schoolId: {}", schoolId, e);
-            ApiResponse response = new ApiResponse(
-                    "SCHOOL_UNEXPECTED_ERROR", "School unexpected error", false, HttpStatus.NOT_FOUND.value()
-            );
-            return new ResponseEntity<>(response, HttpStatus.CONFLICT);
+        if (findSchool == null) {
+            log.info("[ODSCHOOL][SchoolService] School not found with schoolId: {}, error message: School not found with id={}",
+                    schoolId, schoolId);
+            throw new ApiException("School not found with id=" + schoolId, HttpStatus.OK);
         }
+
+        SchoolResponse schoolResponse = mapInterface.toSchoolResponse(findSchool);
+        log.info("[ODSCHOOL][SchoolService] School found successfully with schoolId: {}", schoolId);
+
+        ApiResponse response = new ApiResponse(schoolResponse, "school found successful", true, HttpStatus.OK.value());
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
 
     public ResponseEntity<Object> deleteSchool(int schoolId) {
-        log.trace("[SERVICE] Start deleteSchool method with schoolId {}", schoolId);
-        try {
-            SchoolEntity schoolEntity = schoolRepository.findById(schoolId).orElse(null);
+        log.info("[ODSCHOOL][SchoolService] Start deleting school with schoolId: {}", schoolId);
 
-            if (schoolEntity == null) {
-                log.warn("[SERVICE] school not found with schoolId: {}", schoolId);
-                ApiResponse response = new ApiResponse(
-                        "SCHOOL_NOT_FOUND_ERROR", "School not found", false, HttpStatus.NOT_FOUND.value()
-                );
-                return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
-            }
+        SchoolEntity schoolEntity = schoolRepository.findById(schoolId).orElse(null);
 
-            log.debug("[SERVICE] schoolEntity schoolId {}", schoolEntity.getId());
-            schoolRepository.deleteById(schoolEntity.getId());
-            log.info("[SERVICE] school deleted successful with schoolId {}", schoolEntity.getId());
-
-            ApiResponse response = new ApiResponse("School Deleted", "successful", true, HttpStatus.OK.value());
-            return new ResponseEntity<>(response, HttpStatus.OK);
-        } catch (Exception e) {
-            log.error("[SERVICE] Unexpected error while deleting school with schoolId: {}", schoolId, e);
-            ApiResponse response = new ApiResponse(
-                    "SCHOOL_UNEXPECTED_ERROR", "School unexpected error", false, HttpStatus.NOT_FOUND.value()
-            );
-            return new ResponseEntity<>(response, HttpStatus.CONFLICT);
+        if (schoolEntity == null) {
+            log.info("[ODSCHOOL][SchoolService] School not found with schoolId: {}, error message: School not found with id={}",
+                    schoolId, schoolId);
+            throw new ApiException("School not found with id=" + schoolId, HttpStatus.OK);
         }
+
+        log.info("[ODSCHOOL][SchoolService] School found with schoolId: {}, proceeding to delete", schoolEntity.getId());
+
+        schoolRepository.deleteById(schoolEntity.getId());
+
+        log.info("[ODSCHOOL][SchoolService] School deleted successfully with schoolId: {}", schoolEntity.getId());
+
+        ApiResponse response = new ApiResponse("School Deleted", "successful", true, HttpStatus.OK.value());
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     public ResponseEntity<Object> modifySchool(SchoolResponse schoolDto, int schoolId) {
-        log.trace("[SERVICE] Start modifySchool method with schoolDTO: {} and schoolId: {}", schoolDto, schoolId);
-        try {
-            SchoolEntity schoolEntity = schoolRepository.findById(schoolId).orElse(null);
+        log.info("[ODSCHOOL][SchoolService] Start modifying school with schoolId: {} and requested school name: {}",
+                schoolId, schoolDto.getSchoolName());
 
-            if (schoolEntity == null) {
-                log.warn("[SERVICE] school not found with schoolId: {}", schoolId);
-                ApiResponse response = new ApiResponse(
-                        "SCHOOL_NOT_FOUND_ERROR", "School not found", false, HttpStatus.NOT_FOUND.value()
-                );
-                return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
-            }
-
-            log.debug("[SERVICE] old schoolName: {}", schoolEntity.getSchoolName());
-            schoolEntity.setSchoolName(schoolDto.getSchoolName());
-            log.debug("[SERVICE] updated schoolName: {}", schoolEntity.getSchoolName());
-            schoolRepository.save(schoolEntity);
-            log.info("[SERVICE] update successful with schoolId: {}", schoolEntity.getId());
-
-            ApiResponse response = new ApiResponse(
-                    mapInterface.toSchoolResponse(schoolEntity), "successful", true, HttpStatus.OK.value()
-            );
-            return new ResponseEntity<>(response, HttpStatus.OK);
-        } catch (Exception e) {
-            log.error("[SERVICE] Unexpected error while modifying school with schoolId: {}", schoolId, e);
-            ApiResponse response = new ApiResponse(
-                    "SCHOOL_UNEXPECTED_ERROR", "School unexpected error", false, HttpStatus.NOT_FOUND.value()
-            );
-            return new ResponseEntity<>(response, HttpStatus.CONFLICT);
+        SchoolEntity schoolEntity = schoolRepository.findById(schoolId).orElse(null);
+        if (schoolEntity == null) {
+            log.info("[ODSCHOOL][SchoolService] School not found with schoolId: {}, error message: School not found with id={}",
+                    schoolId, schoolId);
+            throw new ApiException("School not found with id=" + schoolId, HttpStatus.OK);
         }
+
+        log.info("[ODSCHOOL][SchoolService] Old school name: {} for schoolId: {}", schoolEntity.getSchoolName(), schoolId);
+
+        schoolEntity.setSchoolName(schoolDto.getSchoolName());
+
+        log.info("[ODSCHOOL][SchoolService] Updated school name: {} for schoolId: {}", schoolEntity.getSchoolName(), schoolId);
+
+        schoolRepository.save(schoolEntity);
+
+        log.info("[ODSCHOOL][SchoolService] School updated successfully with schoolId: {}", schoolEntity.getId());
+
+        ApiResponse response = new ApiResponse(
+                mapInterface.toSchoolResponse(schoolEntity), "successful", true, HttpStatus.OK.value()
+        );
+        return new ResponseEntity<>(response, HttpStatus.OK);
+
     }
 }

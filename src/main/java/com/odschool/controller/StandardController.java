@@ -7,7 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("odschool/school/{schoolId}/standardId")
+@RequestMapping("odschool/school/{schoolId}/standard")
 public class StandardController {
     @Autowired
     StandardService standardService;
