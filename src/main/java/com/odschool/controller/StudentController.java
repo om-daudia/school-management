@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import static com.odschool.util.TraceIdUtil.setTraceId;
+
 @RestController
 @RequestMapping("odschool/student")
 public class StudentController {
@@ -15,7 +17,7 @@ public class StudentController {
     StudentService studentService;
 
     @GetMapping()
-    public ResponseEntity<Object> getAllStudents(@PathVariable int divisionId) {
+    public ResponseEntity<Object> getAllStudents() {
         return studentService.getAllStudents();
     }
     @PostMapping("/by-school")
@@ -39,16 +41,19 @@ public class StudentController {
 
     @GetMapping("/{studentId}")
     public ResponseEntity<Object> getStudentById(@PathVariable int studentId) {
+        setTraceId("studentId-"+studentId);
         return studentService.getStudentById(studentId);
     }
 
     @DeleteMapping("/{studentId}")
     public ResponseEntity<Object> deleteStudent(@PathVariable int studentId) {
+        setTraceId("studentId-"+studentId);
         return studentService.deleteStudent(studentId);
     }
 
     @PatchMapping("/{studentId}")
     public ResponseEntity<Object> modifyStudent(@RequestBody StudentResponse studentResponseDto, @PathVariable int studentId) {
+        setTraceId("studentId-"+studentId);
         return studentService.modifyStudent(studentResponseDto, studentId);
     }
 }

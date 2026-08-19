@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import static com.odschool.util.TraceIdUtil.setTraceId;
+
 @RestController
 @RequestMapping("odschool/standardId/{standardId}/divisionId")
 public class DivisionController {
@@ -25,16 +27,19 @@ public class DivisionController {
 
     @GetMapping("/{divisionId}")
     public ResponseEntity<Object> getDivisionById(@PathVariable int divisionId) {
+        setTraceId("divisionId-"+divisionId);
         return divisionService.getDivisionById(divisionId);
     }
 
     @DeleteMapping("/{divisionId}")
     public ResponseEntity<Object> deleteDivision(@PathVariable int divisionId) {
+        setTraceId("divisionId-"+divisionId);
         return divisionService.deleteDivision(divisionId);
     }
 
     @PatchMapping("/{divisionId}")
     public ResponseEntity<Object> modifyDivision(@RequestBody DivisionResponse divisionResponseDto, @PathVariable int divisionId) {
+        setTraceId("divisionId-"+divisionId);
         return divisionService.modifyDivision(divisionResponseDto, divisionId);
     }
 }
