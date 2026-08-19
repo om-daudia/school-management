@@ -26,3 +26,9 @@ spring:
   jpa:
     hibernate:
       ddl-auto: validate
+
+# application-dev.properties
+logging:
+  file:
+    path: logs
+    name: odschool_service.log

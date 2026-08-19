@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import static com.odschool.util.TraceIdUtil.setTraceId;
+
 @RestController
 @RequestMapping("odschool/student/{studentId}/subjectmark")
 public class SubjectMarkController {
@@ -25,16 +27,19 @@ public class SubjectMarkController {
 
     @GetMapping("/{subjectMarkId}")
     public ResponseEntity<Object> getSubjectMarkById(@PathVariable int subjectMarkId) {
+        setTraceId("subjectMarkId-"+subjectMarkId);
         return subjectMarkService.getSubjectMarkById(subjectMarkId);
     }
 
     @DeleteMapping("/{subjectMarkId}")
     public ResponseEntity<Object> deleteSubjectMark(@PathVariable int subjectMarkId) {
+        setTraceId("subjectMarkId-"+subjectMarkId);
         return subjectMarkService.deleteSubjectMark(subjectMarkId);
     }
 
     @PatchMapping("/{subjectMarkId}")
     public ResponseEntity<Object> modifySubjectMark(@RequestBody SubjectMarkResponse subjectMarkResponseDto, @PathVariable int subjectMarkId) {
+        setTraceId("subjectMarkId-"+subjectMarkId);
         return subjectMarkService.modifySubjectMark(subjectMarkResponseDto, subjectMarkId);
     }
 }
