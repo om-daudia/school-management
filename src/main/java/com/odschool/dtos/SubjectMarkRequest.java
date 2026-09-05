@@ -5,6 +5,6 @@ import lombok.Data;
 @Data
 public class SubjectMarkRequest {
     private String subjectName;
-    private int marks;
+    private double marks;
     private int studentId;
 }

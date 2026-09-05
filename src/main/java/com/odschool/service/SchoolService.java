@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -39,16 +40,29 @@ public class SchoolService {
 
 
     public ResponseEntity<Object> addSchool(SchoolRequest schoolRequest) {
-        log.info("[ODSCHOOL][SchoolService] Start adding new School with school name: {}", schoolRequest.getSchoolName());
+        log.info("[ODSCHOOL][SchoolService] Start adding new School");
 
-        SchoolEntity findSchool = schoolRepository.findBySchoolName(schoolRequest.getSchoolName());
+        if (schoolRequest == null) {
+            log.info("[ODSCHOOL][SchoolService] Validation failed: schoolRequest is null");
+            throw new ApiException("School request must not be null", HttpStatus.BAD_REQUEST);
+        }
+        if (!StringUtils.hasText(schoolRequest.getSchoolName())) {
+            log.info("[ODSCHOOL][SchoolService] Validation failed: schoolName is null/empty/blank");
+            throw new ApiException("School name must not be null or empty", HttpStatus.BAD_REQUEST);
+        }
+
+        log.info("[ODSCHOOL][SchoolService] Validated request, school name: {}", schoolRequest.getSchoolName());
+
+        String schoolName = schoolRequest.getSchoolName().trim();
+
+        SchoolEntity findSchool = schoolRepository.findBySchoolName(schoolName);
         if (findSchool != null) {
             log.info("[ODSCHOOL][SchoolService] School already exists with school name: {}, sending CONFLICT response",
-                    schoolRequest.getSchoolName());
+                    schoolName);
             throw new ApiException("School already exist", HttpStatus.CONFLICT);
         }
 
-        SchoolEntity schoolEntity = new SchoolEntity(schoolRequest.getSchoolName());
+        SchoolEntity schoolEntity = new SchoolEntity(schoolName);
         schoolRepository.save(schoolEntity);
 
         log.info("[ODSCHOOL][SchoolService] School added successfully with schoolId: {} and school name: {}",
@@ -66,6 +80,11 @@ public class SchoolService {
 
     public ResponseEntity<Object> getSchoolById(int schoolId) {
         log.info("[ODSCHOOL][SchoolService] Start fetching school with schoolId: {}", schoolId);
+
+        if (schoolId <= 0) {
+            log.info("[ODSCHOOL][SchoolService] Validation failed: schoolId {} is not a positive integer", schoolId);
+            throw new ApiException("School id must be a positive number", HttpStatus.BAD_REQUEST);
+        }
 
         SchoolEntity findSchool = schoolRepository.findById(schoolId).orElse(null);
 
@@ -86,6 +105,11 @@ public class SchoolService {
     public ResponseEntity<Object> deleteSchool(int schoolId) {
         log.info("[ODSCHOOL][SchoolService] Start deleting school with schoolId: {}", schoolId);
 
+        if (schoolId <= 0) {
+            log.info("[ODSCHOOL][SchoolService] Validation failed: schoolId {} is not a positive integer", schoolId);
+            throw new ApiException("School id must be a positive number", HttpStatus.BAD_REQUEST);
+        }
+
         SchoolEntity schoolEntity = schoolRepository.findById(schoolId).orElse(null);
 
         if (schoolEntity == null) {
@@ -105,8 +129,23 @@ public class SchoolService {
     }
 
     public ResponseEntity<Object> modifySchool(SchoolResponse schoolDto, int schoolId) {
-        log.info("[ODSCHOOL][SchoolService] Start modifying school with schoolId: {} and requested school name: {}",
-                schoolId, schoolDto.getSchoolName());
+        log.info("[ODSCHOOL][SchoolService] Start modifying school with schoolId: {}", schoolId);
+
+        if (schoolId <= 0) {
+            log.info("[ODSCHOOL][SchoolService] Validation failed: schoolId {} is not a positive integer", schoolId);
+            throw new ApiException("School id must be a positive number", HttpStatus.BAD_REQUEST);
+        }
+            if (schoolDto == null) {
+                log.info("[ODSCHOOL][SchoolService] Validation failed: schoolDto is null");
+                throw new ApiException("School data must not be null", HttpStatus.BAD_REQUEST);
+            }
+            if (!StringUtils.hasText(schoolDto.getSchoolName())) {
+                log.info("[ODSCHOOL][SchoolService] Validation failed: schoolName is null/empty/blank");
+                throw new ApiException("School name must not be null or empty", HttpStatus.BAD_REQUEST);
+            }
+
+
+        log.info("[ODSCHOOL][SchoolService] Validated request, requested school name: {}", schoolDto.getSchoolName());
 
         SchoolEntity schoolEntity = schoolRepository.findById(schoolId).orElse(null);
         if (schoolEntity == null) {
@@ -117,7 +156,7 @@ public class SchoolService {
 
         log.info("[ODSCHOOL][SchoolService] Old school name: {} for schoolId: {}", schoolEntity.getSchoolName(), schoolId);
 
-        schoolEntity.setSchoolName(schoolDto.getSchoolName());
+        schoolEntity.setSchoolName(schoolDto.getSchoolName().trim());
 
         log.info("[ODSCHOOL][SchoolService] Updated school name: {} for schoolId: {}", schoolEntity.getSchoolName(), schoolId);
 

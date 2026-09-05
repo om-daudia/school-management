@@ -31,6 +31,8 @@ public class SubjectMarkService {
     public ResponseEntity<Object> getAllSubjectMarks(int studentId) {
         log.info("[ODSCHOOL][SubjectMarkService] Start fetching all subject marks for studentId: {}", studentId);
 
+        validateStudentId(studentId);
+
         List<SubjectMarkResponse> subjectMarkList = subjectMarkRepository.findAllByStudentEntity_Id(studentId).stream()
                 .map(mapInterface::toSubjectMarkResponse)
                 .collect(Collectors.toList());
@@ -42,7 +44,12 @@ public class SubjectMarkService {
     }
 
     public ResponseEntity<Object> addSubjectMark(SubjectMarkRequest subjectMarkRequest) {
-        log.info("[ODSCHOOL][SubjectMarkService] Start adding new SubjectMark: {} for studentId: {}",
+        log.info("[ODSCHOOL][SubjectMarkService] Start adding new SubjectMark for studentId: {}",
+                subjectMarkRequest == null ? null : subjectMarkRequest.getStudentId());
+
+        validateSubjectMarkRequest(subjectMarkRequest);
+
+        log.info("[ODSCHOOL][SubjectMarkService] Validated request, subject name: {} for studentId: {}",
                 subjectMarkRequest.getSubjectName(), subjectMarkRequest.getStudentId());
 
         SubjectMarkEntity findSubjectMark = subjectMarkRepository.findBySubjectNameAndStudentEntity_Id(
@@ -78,6 +85,8 @@ public class SubjectMarkService {
     public ResponseEntity<Object> getSubjectMarkById(int subjectMarkId) {
         log.info("[ODSCHOOL][SubjectMarkService] Start fetching subject mark with subjectMarkId: {}", subjectMarkId);
 
+        validateSubjectMarkId(subjectMarkId);
+
         SubjectMarkEntity findSubjectMark = subjectMarkRepository.findById(subjectMarkId).orElse(null);
         if (findSubjectMark == null) {
             log.error("[ODSCHOOL][SubjectMarkService] Error while fetching subject mark - Subject Mark not found with id={}", subjectMarkId);
@@ -95,6 +104,8 @@ public class SubjectMarkService {
 
     public ResponseEntity<Object> deleteSubjectMark(int subjectMarkId) {
         log.info("[ODSCHOOL][SubjectMarkService] Start deleting subject mark with subjectMarkId: {}", subjectMarkId);
+
+        validateSubjectMarkId(subjectMarkId);
 
         SubjectMarkEntity subjectMarkEntity = subjectMarkRepository.findById(subjectMarkId).orElse(null);
         if (subjectMarkEntity == null) {
@@ -114,8 +125,12 @@ public class SubjectMarkService {
     }
 
     public ResponseEntity<Object> modifySubjectMark(SubjectMarkResponse subjectMarkDto, int subjectMarkId) {
-        log.info("[ODSCHOOL][SubjectMarkService] Start modifying subject mark with subjectMarkId: {} and requested subject name: {}",
-                subjectMarkId, subjectMarkDto.getSubjectName());
+        log.info("[ODSCHOOL][SubjectMarkService] Start modifying subject mark with subjectMarkId: {}", subjectMarkId);
+
+        validateSubjectMarkId(subjectMarkId);
+        validateSubjectMarkDto(subjectMarkDto);
+
+        log.info("[ODSCHOOL][SubjectMarkService] Validated request, requested subject name: {}", subjectMarkDto.getSubjectName());
 
         SubjectMarkEntity subjectMarkEntity = subjectMarkRepository.findById(subjectMarkId).orElse(null);
         if (subjectMarkEntity == null) {
@@ -137,5 +152,47 @@ public class SubjectMarkService {
                 mapInterface.toSubjectMarkResponse(subjectMarkEntity), "successful", true, HttpStatus.OK.value()
         );
         return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    private void validateStudentId(int studentId) {
+        if (studentId <= 0) {
+            log.info("[ODSCHOOL][SubjectMarkService] Validation failed: studentId {} is not a positive integer", studentId);
+            throw new ApiException("Student id must be a positive number", HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    private void validateSubjectMarkId(int subjectMarkId) {
+        if (subjectMarkId <= 0) {
+            log.info("[ODSCHOOL][SubjectMarkService] Validation failed: subjectMarkId {} is not a positive integer", subjectMarkId);
+            throw new ApiException("Subject mark id must be a positive number", HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    private void validateSubjectMarkRequest(SubjectMarkRequest subjectMarkRequest) {
+        if (subjectMarkRequest == null) {
+            log.info("[ODSCHOOL][SubjectMarkService] Validation failed: subjectMarkRequest is null");
+            throw new ApiException("Subject mark request must not be null", HttpStatus.BAD_REQUEST);
+        }
+        validateStudentId(subjectMarkRequest.getStudentId());
+        validateSubjectMarkFields(subjectMarkRequest.getSubjectName(), subjectMarkRequest.getMarks());
+    }
+
+    private void validateSubjectMarkDto(SubjectMarkResponse subjectMarkDto) {
+        if (subjectMarkDto == null) {
+            log.info("[ODSCHOOL][SubjectMarkService] Validation failed: subjectMarkDto is null");
+            throw new ApiException("Subject mark request must not be null", HttpStatus.BAD_REQUEST);
+        }
+        validateSubjectMarkFields(subjectMarkDto.getSubjectName(), subjectMarkDto.getMarks());
+    }
+
+    private void validateSubjectMarkFields(String subjectName, double marks) {
+        if (subjectName == null || subjectName.isBlank()) {
+            log.info("[ODSCHOOL][SubjectMarkService] Validation failed: subjectName is blank");
+            throw new ApiException("Subject name must not be blank", HttpStatus.BAD_REQUEST);
+        }
+        if (marks < 0) {
+            log.info("[ODSCHOOL][SubjectMarkService] Validation failed: marks {} is negative", marks);
+            throw new ApiException("Marks must not be negative", HttpStatus.BAD_REQUEST);
+        }
     }
 }

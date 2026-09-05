@@ -6,6 +6,6 @@ import lombok.Data;
 public class SubjectMarkResponse {
     private int id;
     private String subjectName;
-    private int marks;
+    private double marks;
     private int studentId;
 }

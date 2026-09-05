@@ -31,6 +31,11 @@ public class StandardService {
     public ResponseEntity<Object> getAllStandards(int schoolId) {
         log.info("[ODSCHOOL][StandardService] Start fetching all standards for schoolId: {}", schoolId);
 
+        if (schoolId <= 0) {
+            log.info("[ODSCHOOL][StandardService] Validation failed: schoolId {} is not a positive integer", schoolId);
+            throw new ApiException("School id must be a positive number", HttpStatus.BAD_REQUEST);
+        }
+
         List<StandardResponse> standardList = standardRepository.findAllBySchoolEntity_Id(schoolId).stream()
                 .map(mapInterface::toStandardResponse)
                 .collect(Collectors.toList());
@@ -42,7 +47,15 @@ public class StandardService {
     }
 
     public ResponseEntity<Object> addStandard(StandardRequest standardRequest, int schoolId) {
-        log.info("[ODSCHOOL][StandardService] Start adding new Standard: {} for schoolId: {}",
+        log.info("[ODSCHOOL][StandardService] Start adding new Standard for schoolId: {}", schoolId);
+
+        if (schoolId <= 0) {
+            log.info("[ODSCHOOL][StandardService] Validation failed: schoolId {} is not a positive integer", schoolId);
+            throw new ApiException("School id must be a positive number", HttpStatus.BAD_REQUEST);
+        }
+        validateStandardRequest(standardRequest);
+
+        log.info("[ODSCHOOL][StandardService] Validated request, standard: {} for schoolId: {}",
                 standardRequest.getStandard(), schoolId);
 
         StandardEntity findStandard = standardRepository.findByStandardAndSchoolEntity_Id(
@@ -77,6 +90,8 @@ public class StandardService {
     public ResponseEntity<Object> getStandardById(int standardId) {
         log.info("[ODSCHOOL][StandardService] Start fetching standard with standardId: {}", standardId);
 
+        validateStandardId(standardId);
+
         StandardEntity findStandard = standardRepository.findById(standardId).orElse(null);
         if (findStandard == null) {
             log.error("[ODSCHOOL][StandardService] Error while fetching standard - Standard not found with id={}", standardId);
@@ -93,6 +108,8 @@ public class StandardService {
 
     public ResponseEntity<Object> deleteStandard(int standardId) {
         log.info("[ODSCHOOL][StandardService] Start deleting standard with standardId: {}", standardId);
+
+        validateStandardId(standardId);
 
         StandardEntity standardEntity = standardRepository.findById(standardId).orElse(null);
         if (standardEntity == null) {
@@ -112,8 +129,12 @@ public class StandardService {
     }
 
     public ResponseEntity<Object> modifyStandard(StandardRequest standardRequest, int standardId) {
-        log.info("[ODSCHOOL][StandardService] Start modifying standard with standardId: {} and requested standard: {}",
-                standardId, standardRequest.getStandard());
+        log.info("[ODSCHOOL][StandardService] Start modifying standard with standardId: {}", standardId);
+
+        validateStandardId(standardId);
+        validateStandardRequest(standardRequest);
+
+        log.info("[ODSCHOOL][StandardService] Validated request, requested standard: {}", standardRequest.getStandard());
 
         StandardEntity standardEntity = standardRepository.findById(standardId).orElse(null);
         if (standardEntity == null) {
@@ -135,5 +156,23 @@ public class StandardService {
                 mapInterface.toStandardResponse(standardEntity), "successful", true, HttpStatus.OK.value()
         );
         return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    private void validateStandardRequest(StandardRequest standardRequest) {
+        if (standardRequest == null) {
+            log.info("[ODSCHOOL][StandardService] Validation failed: standardRequest is null");
+            throw new ApiException("Standard request must not be null", HttpStatus.BAD_REQUEST);
+        }
+        if (standardRequest.getStandard() <= 0) {
+            log.info("[ODSCHOOL][StandardService] Validation failed: standard {} is not a positive integer",
+                    standardRequest.getStandard());
+            throw new ApiException("Standard must be a positive number", HttpStatus.BAD_REQUEST);
+        }
+    }
+    private void validateStandardId(int standardId) {
+        if (standardId <= 0) {
+            log.info("[ODSCHOOL][StandardService] Validation failed: standardId {} is not a positive integer", standardId);
+            throw new ApiException("Standard id must be a positive number", HttpStatus.BAD_REQUEST);
+        }
     }
 }

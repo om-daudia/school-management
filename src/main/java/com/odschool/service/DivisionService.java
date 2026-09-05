@@ -31,6 +31,8 @@ public class DivisionService {
     public ResponseEntity<Object> getAllDivisions(int standardId) {
         log.info("[ODSCHOOL][DivisionService] Start fetching all divisions for standardId: {}", standardId);
 
+        validateStandardId(standardId);
+
         List<DivisionResponse> divisionList = divisionRepository.findAllByStandardEntityId(standardId).stream()
                 .map(mapInterface::toDivisionResponse)
                 .collect(Collectors.toList());
@@ -42,7 +44,12 @@ public class DivisionService {
     }
 
     public ResponseEntity<Object> addDivision(DivisionRequest divisionRequest, int standardId) {
-        log.info("[ODSCHOOL][DivisionService] Start adding new Division: {} for standardId: {}",
+        log.info("[ODSCHOOL][DivisionService] Start adding new Division for standardId: {}", standardId);
+
+        validateStandardId(standardId);
+        validateDivisionRequest(divisionRequest);
+
+        log.info("[ODSCHOOL][DivisionService] Validated request, division: {} for standardId: {}",
                 divisionRequest.getDivision(), standardId);
 
         DivisionEntity findDivision = divisionRepository.findByDivisionAndStandardEntity_Id(
@@ -77,6 +84,8 @@ public class DivisionService {
     public ResponseEntity<Object> getDivisionById(int divisionId) {
         log.info("[ODSCHOOL][DivisionService] Start fetching division with divisionId: {}", divisionId);
 
+        validateDivisionId(divisionId);
+
         DivisionEntity findDivision = divisionRepository.findById(divisionId).orElse(null);
         if (findDivision == null) {
             log.error("[ODSCHOOL][DivisionService] Error while fetching division - Division not found with id={}", divisionId);
@@ -93,6 +102,8 @@ public class DivisionService {
 
     public ResponseEntity<Object> deleteDivision(int divisionId) {
         log.info("[ODSCHOOL][DivisionService] Start deleting division with divisionId: {}", divisionId);
+
+        validateDivisionId(divisionId);
 
         DivisionEntity divisionEntity = divisionRepository.findById(divisionId).orElse(null);
         if (divisionEntity == null) {
@@ -112,8 +123,12 @@ public class DivisionService {
     }
 
     public ResponseEntity<Object> modifyDivision(DivisionResponse divisionDto, int divisionId) {
-        log.info("[ODSCHOOL][DivisionService] Start modifying division with divisionId: {} and requested division: {}",
-                divisionId, divisionDto.getDivision());
+        log.info("[ODSCHOOL][DivisionService] Start modifying division with divisionId: {}", divisionId);
+
+        validateDivisionId(divisionId);
+        validateDivisionDto(divisionDto);
+
+        log.info("[ODSCHOOL][DivisionService] Validated request, requested division: {}", divisionDto.getDivision());
 
         DivisionEntity divisionEntity = divisionRepository.findById(divisionId).orElse(null);
         if (divisionEntity == null) {
@@ -135,5 +150,42 @@ public class DivisionService {
                 mapInterface.toDivisionResponse(divisionEntity), "successful", true, HttpStatus.OK.value()
         );
         return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    private void validateStandardId(int standardId) {
+        if (standardId <= 0) {
+            log.info("[ODSCHOOL][DivisionService] Validation failed: standardId {} is not a positive integer", standardId);
+            throw new ApiException("Standard id must be a positive number", HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    private void validateDivisionId(int divisionId) {
+        if (divisionId <= 0) {
+            log.info("[ODSCHOOL][DivisionService] Validation failed: divisionId {} is not a positive integer", divisionId);
+            throw new ApiException("Division id must be a positive number", HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    private void validateDivisionRequest(DivisionRequest divisionRequest) {
+        if (divisionRequest == null) {
+            log.info("[ODSCHOOL][DivisionService] Validation failed: divisionRequest is null");
+            throw new ApiException("Division request must not be null", HttpStatus.BAD_REQUEST);
+        }
+        validateDivisionValue(divisionRequest.getDivision());
+    }
+
+    private void validateDivisionDto(DivisionResponse divisionDto) {
+        if (divisionDto == null) {
+            log.info("[ODSCHOOL][DivisionService] Validation failed: divisionDto is null");
+            throw new ApiException("Division request must not be null", HttpStatus.BAD_REQUEST);
+        }
+        validateDivisionValue(divisionDto.getDivision());
+    }
+
+    private void validateDivisionValue(char division) {
+        if (division < 'A' || division > 'Z') {
+            log.info("[ODSCHOOL][DivisionService] Validation failed: division '{}' is not an uppercase letter A-Z", division);
+            throw new ApiException("Division must be an uppercase letter between A and Z", HttpStatus.BAD_REQUEST);
+        }
     }
 }

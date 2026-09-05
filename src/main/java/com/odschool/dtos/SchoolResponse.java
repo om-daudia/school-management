@@ -1,14 +1,13 @@
 package com.odschool.dtos;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class SchoolResponse {
-    public SchoolResponse(int id, String schoolName) {
-        this.schoolName = schoolName;
-        this.id = id;
-    }
-
     int id;
     private String schoolName;
 }

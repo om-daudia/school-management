@@ -14,8 +14,8 @@ public class StudentEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     private String studentName;
-    private float obtainMarks;
-    private float percentage;
+    private double obtainMarks;
+    private double percentage;
     private String result;
     @ManyToOne
     @JoinColumn(name = "division_id")

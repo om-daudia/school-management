@@ -2,8 +2,8 @@
 create table student(
     id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     student_name VARCHAR(100) NOT NULL,
-    obtain_marks FLOAT,
-    percentage FLOAT,
+    obtain_marks DOUBLE PRECISION NOT NULL,
+    percentage DOUBLE PRECISION NOT NULL,
     result VARCHAR(10),
     division_id INT,
     CONSTRAINT fk_division

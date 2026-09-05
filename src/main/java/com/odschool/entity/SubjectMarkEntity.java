@@ -11,7 +11,7 @@ public class SubjectMarkEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     private String subjectName;
-    private int marks;
+    private double marks;
     @ManyToOne()
     @JoinColumn(name = "student_id")
     private StudentEntity studentEntity;
